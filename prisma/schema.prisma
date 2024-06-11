@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Define the data model for users
+model User {
+  id       Int    @id @default(autoincrement())
+  email    String @unique
+  password String
+  role     String
+  // Add more fields as needed (e.g., name, contact details)
+
+  // One-to-one relationships with recruit and recruiter
+  recruit     Recruit?
+  recruiter   Recruiter?
+  ActivityLog ActivityLog[]
+}
+
+model ActivityLog {
+  id          Int      @id @default(autoincrement())
+  action      String
+  description String
+  createdAt   DateTime @default(now())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+// Define the data model for companies
+model Company {
+  id   Int    @id @default(autoincrement())
+  name String
+  // Add more fields as needed (e.g., address, industry, logo)
+
+  // One-to-many relationship with recruiters
+  recruiters Recruiter[]
+}
+
+// Define the data model for recruits
+model Recruit {
+  id        Int    @id @default(autoincrement())
+  firstName String
+  lastName  String
+  emailAddress String @unique
+  // Add more fields as needed (e.g., profile picture, contact details)
+
+  // One-to-one relationship with user
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // One-to-many relationship with applications
+  applications Application[]
+
+  // One-to-many relationship with interviews
+  interviews Interview[]
+}
+
+// Define the data model for recruiters
+model Recruiter {
+  id Int @id @default(autoincrement())
+  // Add more fields as needed (e.g., contact details)
+
+  // One-to-one relationship with user
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  // Many-to-one relationship with company
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+
+  // One-to-many relationship with job offers
+  jobOffers JobOffer[]
+
+  // One-to-many relationship with interviews
+  interviews Interview[]
+}
+
+// Define the data model for job offers
+model JobOffer {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+  location    String
+  salary      Float
+  // Add more fields as needed (e.g., requirements, benefits)
+
+  // Many-to-one relationship with recruiter
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
+  recruiterId Int
+
+  // One-to-many relationship with applications
+  applications Application[]
+
+  // One-to-many relationship with interviews
+  interviews Interview[]
+}
+
+// Define the data model for applications
+model Application {
+  id         Int       @id @default(autoincrement())
+  recruit    Recruit   @relation(fields: [recruitId], references: [id])
+  recruitId  Int
+  jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
+  jobOfferId Int?
+  status     String // e.g., "pending", "accepted", "rejected"
+  // Add more fields as needed (e.g., application date, notes)
+}
+
+// Define the data model for interviews
+model Interview {
+  id   Int      @id @default(autoincrement())
+  date DateTime
+  // Add more fields as needed (e.g., start time, end time, location)
+
+  // Many-to-one relationship with recruit
+  recruit   Recruit @relation(fields: [recruitId], references: [id])
+  recruitId Int
+
+  // Many-to-one relationship with recruiter
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
+  recruiterId Int
+
+  // Many-to-one relationship with job offer
+  jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id])
+  jobOfferId Int?
+}
