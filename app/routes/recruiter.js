@@ -81,33 +81,7 @@ recruiterRouter.use(authenticateToken);
 
 // Routes below this middleware require authentication
 
-/**
- * @swagger
- * /recruiters/{recruiterId}/profile:
- *   get:
- *     summary: Get Recruiter profile
- *     tags: [Recruiter]
- *     parameters:
- *       - in: path
- *         name: recruiterId
- *         required: true
- *         schema:
- *           type: integer
- *         description: The ID of the recruiter
- *     responses:
- *       200:
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Profile'
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/InternalServerError'
- */
+
 
 // Get recruiter profile
 recruiterRouter.get('/:recruiterId/profile', async (req, res) => {

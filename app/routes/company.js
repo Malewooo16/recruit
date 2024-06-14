@@ -9,7 +9,66 @@ const companyRouter = express.Router();
 
 companyRouter.use(authenticateToken);
 
-companyRouter.post('/add', async (req, res) => {
+/**
+ * @swagger
+ * tags:
+ *   - name: Company
+ *     description: API endpoints to manage companies
+ */
+
+
+/**
+ * @swagger
+ * /companies/addCompany:
+ *   post:
+ *     summary: Register a new company
+ *     tags: [Company]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               firstName:
+ *                 type: string
+ *                 description: Recruiter's name
+ *               lastName:
+ *                 type: string
+ *                 description: Recruiter's email
+ *               email:
+ *                 type: string
+ *                 description: Recruiter's email
+ *               password:
+ *                 type: string
+ *                 description: Recruiter's password
+ *     responses:
+ *       200:
+ *         description: Recruit successfully registered
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                   description: Recruit ID
+ *                 name:
+ *                   type: string
+ *                   description: Recruit's name
+ *                 email:
+ *                   type: string
+ *                   description: Recruit's email
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+companyRouter.post('/addCompany', async (req, res) => {
   try {
     const newCompany = await createCompany(req.body);
     res.json(newCompany);
@@ -18,6 +77,44 @@ companyRouter.post('/add', async (req, res) => {
   }
 });
 
+
+/**
+ * @swagger
+ * /companies/{companyId}:
+ *   post:
+ *     summary: Get Company by Id
+ *     tags: [Company]
+ *     parameters:
+ *       - in: path
+ *         name: recruiterId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recruiter
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recruiterId:
+ *                type: integer
+ *                description: Recruiters Id
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Profile'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 companyRouter.post('/:id', async (req, res) => {
   try {
     const {recruiterId, ...rest} = req.body
