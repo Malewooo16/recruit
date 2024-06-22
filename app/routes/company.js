@@ -1,9 +1,7 @@
-//@ts-check
+// @ts-check
 import express from 'express';
 import { authenticateToken } from '../actions/auth.js';
 import { createCompany, getCompanyById, updateCompany, deleteCompany, getAllCompanies } from '../actions/company.js';
-
-
 
 const companyRouter = express.Router();
 
@@ -15,7 +13,6 @@ companyRouter.use(authenticateToken);
  *   - name: Company
  *     description: API endpoints to manage companies
  */
-
 
 /**
  * @swagger
@@ -32,35 +29,34 @@ companyRouter.use(authenticateToken);
  *           schema:
  *             type: object
  *             properties:
- *               firstName:
+ *               recruiterId:
+ *                  type: integer
+ *                  description: Recruiter ID
+ *               name:
  *                 type: string
- *                 description: Recruiter's name
- *               lastName:
+ *                 description: Company Name
+ *               industry:
  *                 type: string
- *                 description: Recruiter's email
- *               email:
+ *                 description: Company Industry
+ *               phoneNumber:
  *                 type: string
- *                 description: Recruiter's email
- *               password:
+ *                 description: Company Phone Number
+ *               emailAddress:
  *                 type: string
- *                 description: Recruiter's password
+ *                 description: Company Email Address
+ *               address:
+ *                 type: string
+ *                 description: Company Physical Address
+ *               website:
+ *                  type: string
+ *                  description: Company Website
  *     responses:
  *       200:
- *         description: Recruit successfully registered
+ *         description: Company successfully registered
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   description: Recruit ID
- *                 name:
- *                   type: string
- *                   description: Recruit's name
- *                 email:
- *                   type: string
- *                   description: Recruit's email
+ *               $ref: '#/components/schemas/Company'
  *       400:
  *         description: Invalid input
  *         content:
@@ -77,20 +73,59 @@ companyRouter.post('/addCompany', async (req, res) => {
   }
 });
 
-
 /**
  * @swagger
- * /companies/{companyId}:
- *   post:
- *     summary: Get Company by Id
+ * /companies/{id}:
+ *   get:
+ *     summary: Get Company by ID
  *     tags: [Company]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: recruiterId
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the recruiter
+ *         description: The ID of the company
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Company'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+companyRouter.get('/:id', async (req, res) => {
+  try {
+    const company = await getCompanyById(parseInt(req.params.id));
+    res.json(company);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /companies/updateCompany/{id}:
+ *   put:
+ *     summary: Update a company
+ *     tags: [Company]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the company
  *     requestBody:
  *       required: true
  *       content:
@@ -99,35 +134,43 @@ companyRouter.post('/addCompany', async (req, res) => {
  *             type: object
  *             properties:
  *               recruiterId:
- *                type: integer
- *                description: Recruiters Id
+ *                  type: integer
+ *                  description: Recruiter ID
+ *               name:
+ *                 type: string
+ *                 description: Company Name
+ *               industry:
+ *                 type: string
+ *                 description: Company Industry
+ *               phoneNumber:
+ *                 type: string
+ *                 description: Company Phone Number
+ *               emailAddress:
+ *                 type: string
+ *                 description: Company Email Address
+ *               address:
+ *                 type: string
+ *                 description: Company Physical Address
+ *               website:
+ *                  type: string
+ *                  description: Company Website
  *     responses:
  *       200:
- *         description: Successful response
+ *         description: Company successfully updated
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/Profile'
- *       401:
- *         $ref: '#/components/responses/UnauthorizedError'
- *       404:
- *         $ref: '#/components/responses/NotFound'
- *       500:
- *         $ref: '#/components/responses/InternalServerError'
+ *               $ref: '#/components/schemas/Company'
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
  */
-companyRouter.post('/:id', async (req, res) => {
+companyRouter.put('/updateCompany/:id', async (req, res) => {
   try {
-    const {recruiterId, ...rest} = req.body
-    const company = await getCompanyById(parseInt(req.params.id), recruiterId);
-    res.json(company);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-companyRouter.put('/:id', async (req, res) => {
-  try {
-    const {recruiterId, ...rest} = req.body
+    const { recruiterId, ...rest } = req.body;
     const updatedCompany = await updateCompany(parseInt(req.params.id), rest, recruiterId);
     res.json(updatedCompany);
   } catch (error) {
@@ -135,20 +178,88 @@ companyRouter.put('/:id', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /companies/{id}:
+ *   delete:
+ *     summary: Delete a company
+ *     tags: [Company]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the company
+ *     responses:
+ *       200:
+ *         description: Company successfully deleted
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Success message
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 companyRouter.delete('/:id', async (req, res) => {
   try {
-    const result = await deleteCompany(parseInt(req.params.id), req);
+    const result = await deleteCompany(parseInt(req.params.id));
     res.json(result);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 });
 
-companyRouter.get('/getAllCompanies', async (req, res) => {
+/**
+ * @swagger
+ * /companies:
+ *   get:
+ *     summary: Get all companies
+ *     tags: [Company]
+ *     security:
+ *       - cookieAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of companies
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Company'
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
+companyRouter.get('/', async (req, res) => {
   try {
-    
     const companies = await getAllCompanies(req.user.userId);
-    companies === "Unauthorized Access" ? res.status(404).json(companies) : res.json(companies);
+    res.json(companies);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
