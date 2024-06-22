@@ -2,9 +2,9 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function createCompany(companyData) {
+export async function createCompany(companyData, recruiterId) {
   const newCompany = await prisma.company.create({
-    data: companyData,
+    data: {companyData, recruiters:{connect:{id:recruiterId}} },
   });
   return newCompany;
 }

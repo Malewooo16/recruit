@@ -1,4 +1,1 @@
-console.log(JSON.parse({
-    "username":"hehhe@gmail.com",
-    "password":"Nuts"
-  }))
+console.log(JSON.stringify(['software', 'it', 'HR', 'finance', 'marketing', 'sales']))

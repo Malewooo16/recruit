@@ -1,11 +1,10 @@
-//@ts-check
-
+// @ts-check
 import express from 'express';
 import { authenticateToken } from '../actions/auth.js';
 import { registerRecruiter, fetchRecruiterProfile, updateRecruiterProfile, deleteRecruiter } from '../actions/recruiter.js';
 
-
 const recruiterRouter = express.Router();
+
 /**
  * @swagger
  * tags:
@@ -13,12 +12,11 @@ const recruiterRouter = express.Router();
  *     description: API endpoints to manage recruiters
  */
 
-// Register new recruit
 /**
  * @swagger
  * /recruits/addRecruiter:
  *   post:
- *     summary: Register a new recruit
+ *     summary: Register a new recruiter
  *     tags: [Recruiter]
  *     security:
  *       - cookieAuth: []
@@ -31,10 +29,10 @@ const recruiterRouter = express.Router();
  *             properties:
  *               firstName:
  *                 type: string
- *                 description: Recruiter's name
+ *                 description: Recruiter's first name
  *               lastName:
  *                 type: string
- *                 description: Recruiter's email
+ *                 description: Recruiter's last name
  *               email:
  *                 type: string
  *                 description: Recruiter's email
@@ -43,7 +41,7 @@ const recruiterRouter = express.Router();
  *                 description: Recruiter's password
  *     responses:
  *       200:
- *         description: Recruit successfully registered
+ *         description: Recruiter successfully registered
  *         content:
  *           application/json:
  *             schema:
@@ -51,13 +49,16 @@ const recruiterRouter = express.Router();
  *               properties:
  *                 id:
  *                   type: integer
- *                   description: Recruit ID
- *                 name:
+ *                   description: Recruiter ID
+ *                 firstName:
  *                   type: string
- *                   description: Recruit's name
+ *                   description: Recruiter's first name
+ *                 lastName:
+ *                   type: string
+ *                   description: Recruiter's last name
  *                 email:
  *                   type: string
- *                   description: Recruit's email
+ *                   description: Recruiter's email
  *       400:
  *         description: Invalid input
  *         content:
@@ -65,8 +66,6 @@ const recruiterRouter = express.Router();
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-
-// Register new recruiter
 recruiterRouter.post('/addRecruiter', async (req, res) => {
   try {
     const newRecruiter = await registerRecruiter(req.body);
@@ -79,11 +78,35 @@ recruiterRouter.post('/addRecruiter', async (req, res) => {
 // Protected routes
 recruiterRouter.use(authenticateToken);
 
-// Routes below this middleware require authentication
-
-
-
-// Get recruiter profile
+/**
+ * @swagger
+ * /recruiters/{recruiterId}/profile:
+ *   get:
+ *     summary: Get recruiter profile
+ *     tags: [Recruiter]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: recruiterId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: The ID of the recruiter
+ *     responses:
+ *       200:
+ *         description: Successful response
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Profile'
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFound'
+ *       500:
+ *         $ref: '#/components/responses/InternalServerError'
+ */
 recruiterRouter.get('/:recruiterId/profile', async (req, res) => {
   const recruiterId = parseInt(req.params.recruiterId);
   try {
@@ -96,17 +119,19 @@ recruiterRouter.get('/:recruiterId/profile', async (req, res) => {
 
 /**
  * @swagger
- * /recruiters/{recruitId}/profile:
+ * /recruiters/{recruiterId}/profile:
  *   put:
- *     summary: Update Recruit profile
+ *     summary: Update recruiter profile
  *     tags: [Recruiter]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: recruitId
+ *         name: recruiterId
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the recruit
+ *         description: The ID of the recruiter
  *     requestBody:
  *       required: true
  *       content:
@@ -114,12 +139,15 @@ recruiterRouter.get('/:recruiterId/profile', async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               name:
+ *               firstName:
  *                 type: string
- *                 description: Recruit's name
+ *                 description: Recruiter's first name
+ *               lastName:
+ *                 type: string
+ *                 description: Recruiter's last name
  *               email:
  *                 type: string
- *                 description: Recruit's email
+ *                 description: Recruiter's email
  *     responses:
  *       200:
  *         description: Profile successfully updated
@@ -140,8 +168,6 @@ recruiterRouter.get('/:recruiterId/profile', async (req, res) => {
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
-
-// Update recruiter profile
 recruiterRouter.put('/:recruiterId/profile', async (req, res) => {
   const recruiterId = parseInt(req.params.recruiterId);
   try {
@@ -152,23 +178,24 @@ recruiterRouter.put('/:recruiterId/profile', async (req, res) => {
   }
 });
 
-// Delete recruiter
 /**
  * @swagger
  * /recruiters/{recruiterId}:
  *   delete:
- *     summary: Delete a recruit
+ *     summary: Delete a recruiter
  *     tags: [Recruiter]
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *       - in: path
- *         name: recruitId
+ *         name: recruiterId
  *         required: true
  *         schema:
  *           type: integer
- *         description: The ID of the recruit
+ *         description: The ID of the recruiter
  *     responses:
  *       200:
- *         description: Recruit successfully deleted
+ *         description: Recruiter successfully deleted
  *         content:
  *           application/json:
  *             schema:
