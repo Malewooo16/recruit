@@ -9,6 +9,8 @@ import swaggerJSDoc from "swagger-jsdoc"
 import { options } from "./app/swagger.js"
 import swaggerUi from 'swagger-ui-express'
 import companyRouter from "./app/routes/company.js"
+import jobOfferRouter from "./app/routes/company.js"
+
 
 
 const app = express()
@@ -21,10 +23,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
 }))
 
-app.use(`/api/users`, usersRoutes )
-app.use(`/api/recruits`, recruitRouter)
-app.use(`/api/recruiter`, recruiterRouter)
+app.use(`/api/users`, usersRoutes );
+app.use(`/api/recruits`, recruitRouter);
+app.use(`/api/recruiter`, recruiterRouter);
 app.use('/api/companies', companyRouter);
+app.use('/api/joboffers', jobOfferRouter);
 
 const specs = swaggerJSDoc(options)
 
