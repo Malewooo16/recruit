@@ -37,6 +37,7 @@ model Recruit {
   id        Int    @id @default(autoincrement())
   firstName String
   lastName  String
+  email     String @unique
   userId    Int  @unique
   user      User @relation(fields: [userId], references: [id])
   applications Application[]
@@ -45,6 +46,9 @@ model Recruit {
 
 model Recruiter {
   id         Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String @unique
   role       String
   userId     Int      @unique
   user       User     @relation(fields: [userId], references: [id])
@@ -67,16 +71,25 @@ model JobOffer {
 
 model Application {
   id         Int       @id @default(autoincrement())
+  jobName    String
   recruit    Recruit   @relation(fields: [recruitId], references: [id])
   recruitId  Int
   jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
   jobOfferId Int?
   status     String
+  createdAt  DateTime @default(now())
 }
 
 model Interview {
   id          Int       @id @default(autoincrement())
   date        DateTime
+  location    String?
+  email       String
+  phone       String
+  online      Boolean
+  startTime   DateTime?
+  joinMeetingUrl   String?
+  startMeetingUrl   String?
   recruit     Recruit   @relation(fields: [recruitId], references: [id])
   recruitId   Int
   recruiter   Recruiter @relation(fields: [recruiterId], references: [id])

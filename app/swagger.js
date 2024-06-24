@@ -54,6 +54,34 @@ export const options = {
                         }
                     }
                 },
+                Application: {
+                    type: 'object',
+                    properties: {
+                      id: {
+                        type: 'integer',
+                        description: 'Application ID'
+                      },
+                      jobName: {
+                        type: 'string',
+                        description: 'Application Job Name'
+                      },
+                      recruitId: {
+                        type: 'integer',
+                        description: 'Recruit ID'
+                      },
+                      jobOfferId: {
+                        type: 'integer',
+                        description: 'Job offer ID'
+                      },
+                      status: {
+                        type: 'string',
+                        description: 'Application status'
+                      },
+                      createdAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        description: 'Creation timestamp'
+                      },}},
                 Company: {
                     type: 'object',
                     required:['name', 'phoneNumber', 'emailAddress', 'address', 'website'],
@@ -88,6 +116,42 @@ export const options = {
                         },
                     }
                 },
+                Interview: {
+                    type: 'object',
+                    properties: {
+                      id: {
+                        type: 'integer',
+                        description: 'Interview ID'
+                      },
+                      recruitId: {
+                        type: 'integer',
+                        description: 'Recruit ID'
+                      },
+                      jobOfferId: {
+                        type: 'integer',
+                        description: 'Job offer ID'
+                      },
+                      date: {
+                        type: 'string',
+                        format: 'date-time',
+                        description: 'Date and time of the interview'
+                      },
+                      status: {
+                        type: 'string',
+                        description: 'Interview status'
+                      },
+                      createdAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        description: 'Creation timestamp'
+                      },
+                      updatedAt: {
+                        type: 'string',
+                        format: 'date-time',
+                        description: 'Update timestamp'
+                      }
+                    }
+                  },
                 LoginResponse: {
                     type: 'object',
                     properties: {
