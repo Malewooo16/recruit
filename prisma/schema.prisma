@@ -29,6 +29,11 @@ model ActivityLog {
 model Company {
   id         Int          @id @default(autoincrement())
   name       String
+  industry   String
+  departments String
+  website     String
+  logo        String?
+  emailAddress String
   recruiters Recruiter[]
   jobOffers  JobOffer[]
 }
