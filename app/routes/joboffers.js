@@ -67,6 +67,9 @@ jobOfferRouter.use(authenticateToken);
 
 jobOfferRouter.post('/', async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "RECRUITER") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
     const recruiterId = req.user.id;
     const newJobOffer = await createJobOffer(recruiterId, req.body);
     res.json(newJobOffer);
@@ -112,15 +115,21 @@ jobOfferRouter.post('/', async (req, res) => {
  */
 jobOfferRouter.get('/:id', async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "RECRUITER") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
+
     const recruiterId = req.user.id;
     const jobOfferId = parseInt(req.params.id, 10);
     const jobOffer = await getJobOffer(jobOfferId, recruiterId);
+
     if (!jobOffer) {
       return res.status(404).json({ error: 'Job offer not found' });
     }
+
     res.json(jobOffer);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -173,6 +182,7 @@ jobOfferRouter.get('/:id', async (req, res) => {
  *               $ref: '#/components/schemas/ErrorResponse'
  */
 jobOfferRouter.put('/:id', async (req, res) => {
+
   try {
     const recruiterId = req.user.id;
     const jobOfferId = parseInt(req.params.id, 10);

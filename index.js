@@ -27,7 +27,7 @@ app.use(cors({
 
 app.use(`/api/users`, usersRoutes );
 app.use(`/api/recruits`, recruitRouter);
-app.use(`/api/recruiter`, recruiterRouter);
+app.use(`/api/recruiters`, recruiterRouter);
 app.use('/api/companies', companyRouter);
 app.use('/api/joboffers', jobOfferRouter);
 app.use(`/api/applications`, applicationRouter);

@@ -1,7 +1,7 @@
 // @ts-check
 import express from 'express';
-import { authenticateToken } from '../actions/auth';
-import { createInterview, getAllInterviews, getInterviewsByRecruit, getInterviewsByJobOffer, getInterviewById, updateInterview, deleteInterview } from '../actions/interviews';
+import { authenticateToken } from '../actions/auth.js';
+import { createInterview, getAllInterviews, getInterviewsByRecruit, getInterviewsByJobOffer, getInterviewById, updateInterview, deleteInterview } from '../actions/interviews.js';
 
 const interviewRouter = express.Router();
 
@@ -56,15 +56,14 @@ interviewRouter.use(authenticateToken);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-interviewRouter.post('/', async (req, res) => {
+interviewRouter.post('/', async (req, res) => { 
   try {
     const interviewData = req.body;
     const newInterview = await createInterview(interviewData);
     res.json(newInterview);
   } catch (error) {
     res.status(400).json({ error: error.message });
-  }
-});
+} });
 
 /**
  * @swagger

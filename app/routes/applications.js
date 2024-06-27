@@ -1,7 +1,8 @@
 // @ts-check
 import express from 'express';
-import { createApplication, getAllApplications, getApplicationsByRecruit, getApplicationsByJobOffer, getApplicationById, updateApplicationStatus, deleteApplication } from '../actions/applications';
-import { authenticateToken } from '../actions/auth';
+import { authenticateToken } from '../actions/auth.js';
+import { createApplication, getAllApplications, getApplicationsByRecruit, getApplicationsByJobOffer, getApplicationById, updateApplicationStatus, deleteApplication } from '../actions/applications.js';
+
 
 
 const applicationRouter = express.Router();
@@ -310,4 +311,5 @@ applicationRouter.delete('/:id', async (req, res) => {
   }
 });
 
-export default applicationRouter;
+
+export default applicationRouter

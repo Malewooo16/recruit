@@ -23,7 +23,7 @@ export async function registerRecruit(recruitData) {
   const newRecruit = await prisma.recruit.create({
     data: {
       userId: newUser.id,
-      emailAddress:email,
+      email,
       ...rest,
     },
   });

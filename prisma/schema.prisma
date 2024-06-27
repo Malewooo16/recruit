@@ -46,14 +46,14 @@ model Recruit {
 
 model Recruiter {
   id         Int      @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String @unique
+  firstName  String
+  lastName   String
+  email      String @unique
   role       String
   userId     Int      @unique
   user       User     @relation(fields: [userId], references: [id])
-  companyId  Int
-  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  Int?
+  company    Company?  @relation(fields: [companyId], references: [id])
   interviews Interview[]
 }
 

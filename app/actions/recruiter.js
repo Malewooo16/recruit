@@ -10,27 +10,43 @@ const saltRounds = 10;
 
 export async function registerRecruiter(recruiterData) {
   const { email, password, ...rest } = recruiterData;
-  const hashedPassword = await bcrypt.hash(password, saltRounds);
-  
-  const newUser = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      role: 'RECRUITER', // Assuming role for recruiter
-      
-    },
-  });
 
-  const newRecruiter = await prisma.recruiter.create({
-    data: {
-      userId: newUser.id,
-      email,
-      ...rest,
-    },
-  });
+  try {
+    // Check if email already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      throw new Error('Email already exists');
+    }
 
-  await logActivity(newUser.id, 'RECRUITER_REGISTERED', `Recruiter registered with ID: ${newRecruiter.id}`);
-  return newRecruiter;
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create new user
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+        role: 'RECRUITER', // Assuming role for recruiter
+      },
+    });
+
+    // Create new recruiter
+    const newRecruiter = await prisma.recruiter.create({
+      data: {
+        userId: newUser.id,
+        email,
+        ...rest,
+      },
+    });
+
+    // Log activity
+    await logActivity(newUser.id, 'RECRUITER_REGISTERED', `Recruiter registered with ID: ${newRecruiter.id}`);
+
+    return newRecruiter;
+  } catch (error) {
+    console.error('Error registering recruiter:', error);
+    throw error; // Propagate the error to the caller
+  }
 }
 
 export async function fetchRecruiterProfile(recruiterId) {

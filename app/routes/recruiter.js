@@ -14,7 +14,7 @@ const recruiterRouter = express.Router();
 
 /**
  * @swagger
- * /recruits/addRecruiter:
+ * /recruiters/addRecruiter:
  *   post:
  *     summary: Register a new recruiter
  *     tags: [Recruiter]
@@ -71,7 +71,11 @@ recruiterRouter.post('/addRecruiter', async (req, res) => {
     const newRecruiter = await registerRecruiter(req.body);
     res.json(newRecruiter);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    if (error.message === 'Email already exists') {
+      return res.status(400).json({ error: 'Email already exists' });
+    }
+    console.error('Error registering recruiter:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -111,6 +115,7 @@ recruiterRouter.get('/:recruiterId/profile', async (req, res) => {
   const recruiterId = parseInt(req.params.recruiterId);
   try {
     const recruiterProfile = await fetchRecruiterProfile(recruiterId);
+    if(recruiterProfile)
     res.json(recruiterProfile);
   } catch (error) {
     res.status(404).json({ error: error.message });

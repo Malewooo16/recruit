@@ -40,6 +40,11 @@ export async function getJobOffer(jobOfferId, recruiterId) {
   return jobOffer;
 }
 
+/**
+ * @param {number} jobOfferId
+ * @param {number} recruiterId
+ * @param {{ title: any; }} updateData
+ */
 export async function updateJobOffer(jobOfferId, recruiterId, updateData) {
   const recruiter = await prisma.recruiter.findUnique({ where: { id: recruiterId } });
 
