@@ -10,6 +10,8 @@ import { options } from "./app/swagger.js"
 import swaggerUi from 'swagger-ui-express'
 import companyRouter from "./app/routes/company.js"
 import jobOfferRouter from "./app/routes/company.js"
+import applicationRouter from "./app/routes/applications.js"
+import interviewRouter from "./app/routes/interviews.js"
 
 
 
@@ -28,6 +30,11 @@ app.use(`/api/recruits`, recruitRouter);
 app.use(`/api/recruiter`, recruiterRouter);
 app.use('/api/companies', companyRouter);
 app.use('/api/joboffers', jobOfferRouter);
+app.use(`/api/applications`, applicationRouter);
+app.use(`/api/interviews`, interviewRouter);
+
+
+//TODO include additional checks for fetching datat to ensure the integrity of the user view levels
 
 const specs = swaggerJSDoc(options)
 

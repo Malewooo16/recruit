@@ -14,6 +14,7 @@ export const options = {
         ],
         components: {
             schemas: {
+                //TODO check for missing or inaccurate schemas
                 User: {
                     type: 'object',
                     required: ['email', 'password'],

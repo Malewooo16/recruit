@@ -1,3 +1,4 @@
+
 import jwt from 'jsonwebtoken';
 
 /**
@@ -12,6 +13,7 @@ import jwt from 'jsonwebtoken';
  * @param {import('express').Response} res - The response object
  * @param {import('express').NextFunction} next - The next middleware function
  */
+//TODO extend the request body to include user data
 export function authenticateToken(req, res, next) {
   const token = req.cookies.token; // Read token from cookie
   if (!token) {

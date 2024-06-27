@@ -1,4 +1,4 @@
-// @ts-check
+
 import express from 'express';
 import { createJobOffer, getJobOffer, updateJobOffer, deleteJobOffer, getAllJobOffers } from '../actions/joboffers';
 import { authenticateToken } from '../actions/auth';
@@ -6,6 +6,8 @@ import { authenticateToken } from '../actions/auth';
 const jobOfferRouter = express.Router();
 
 jobOfferRouter.use(authenticateToken);
+
+
 
 /**
  * @swagger
@@ -55,6 +57,14 @@ jobOfferRouter.use(authenticateToken);
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
+
+/**
+ * @typedef {Object} User
+ * @property {number} userId - The user ID
+ * @property {string} role - The user's role
+ */
+
+
 jobOfferRouter.post('/', async (req, res) => {
   try {
     const recruiterId = req.user.id;
@@ -243,6 +253,7 @@ jobOfferRouter.delete('/:id', async (req, res) => {
  */
 jobOfferRouter.get('/', async (req, res) => {
   try {
+   
     const recruiterId = req.user.id;
     const jobOffers = await getAllJobOffers(recruiterId);
     res.json(jobOffers);

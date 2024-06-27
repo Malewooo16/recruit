@@ -1,9 +1,12 @@
-// @ts-check
+
+
 import express from 'express';
 import { authenticateToken } from '../actions/auth.js';
 import { createCompany, getCompanyById, updateCompany, deleteCompany, getAllCompanies } from '../actions/company.js';
 
 const companyRouter = express.Router();
+
+
 
 companyRouter.use(authenticateToken);
 
@@ -256,6 +259,7 @@ companyRouter.delete('/:id', async (req, res) => {
  *       500:
  *         $ref: '#/components/responses/InternalServerError'
  */
+
 companyRouter.get('/', async (req, res) => {
   try {
     const companies = await getAllCompanies(req.user.userId);
