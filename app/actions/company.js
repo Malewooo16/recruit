@@ -1,12 +1,22 @@
 import { PrismaClient } from '@prisma/client';
+import { getRecruiterInfo } from './users.js';
 
 const prisma = new PrismaClient();
 
-export async function createCompany(companyData, recruiterId) {
-  const newCompany = await prisma.company.create({
-    data: {companyData, recruiters:{connect:{id:recruiterId}} },
-  });
-  return newCompany;
+export async function createCompany(companyData, userId) {
+  try{
+
+    const recruiter = await getRecruiterInfo(userId)
+    const newCompany = await prisma.company.create({
+      data: {...companyData, recruiters:{connect:{id:recruiter.id}} },
+    });
+    return newCompany;
+  }
+ 
+ catch(e){
+  console.log(e)
+ }
+ 
 }
 
 export async function getCompanyById(companyId, recruiterId) {

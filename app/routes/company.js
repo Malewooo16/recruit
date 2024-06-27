@@ -32,9 +32,6 @@ companyRouter.use(authenticateToken);
  *           schema:
  *             type: object
  *             properties:
- *               recruiterId:
- *                  type: integer
- *                  description: Recruiter ID
  *               name:
  *                 type: string
  *                 description: Company Name
@@ -69,7 +66,11 @@ companyRouter.use(authenticateToken);
  */
 companyRouter.post('/addCompany', async (req, res) => {
   try {
-    const newCompany = await createCompany(req.body);
+    if (!req.user || req.user.role !== "RECRUITER") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
+    const newCompany = await createCompany(req.body, parseInt(req.user.userId));
+    //console.log(req.user)
     res.json(newCompany);
   } catch (error) {
     res.status(400).json({ error: error.message });

@@ -8,6 +8,7 @@ import logActivity from '../../utils/logsActivites.js';
 
 
 
+
 const prisma = new PrismaClient();
 const saltRounds = 10;
 const jwtSecret = process.env.JWT_SECRET;
@@ -76,6 +77,17 @@ export async function changeUserRole(userId, newRole) {
   });
   await logActivity(userId, 'USER_ROLE_CHANGED', `User role changed to ${newRole} for email: ${updatedUser.email}`);
   return updatedUser;
+}
+
+export async function getRecruiterInfo(userId){
+  const recruiter = await prisma.user.findUnique({
+    where:{id:userId},
+
+    select:{
+      recruiter:true
+    }
+  })
+  return recruiter.recruiter
 }
 
 export async function resetPassword(email, newPassword) {

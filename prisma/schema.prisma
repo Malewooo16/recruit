@@ -30,10 +30,12 @@ model Company {
   id         Int          @id @default(autoincrement())
   name       String
   industry   String
-  departments String
+  departments String?
   website     String
   logo        String?
   emailAddress String
+  phoneNumber  String
+  physicalAddress String
   recruiters Recruiter[]
   jobOffers  JobOffer[]
 }
