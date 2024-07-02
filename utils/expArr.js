@@ -1,0 +1,1 @@
+export const expArray = ["< 1 year", "1-2 years", "3-4 years", "5+ years"]

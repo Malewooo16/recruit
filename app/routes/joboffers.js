@@ -1,13 +1,77 @@
 
 import express from 'express';
-import { createJobOffer, getJobOffer, updateJobOffer, deleteJobOffer, getAllJobOffers } from '../actions/joboffers';
-import { authenticateToken } from '../actions/auth';
+import { createJobOffer, getJobOffer, updateJobOffer, deleteJobOffer, getAllJobOffers } from '../actions/joboffers.js';
+import { authenticateToken } from '../actions/auth.js';
 
 const jobOfferRouter = express.Router();
 
+/**
+ * @swagger
+ * /jobOffers:
+ *   get:
+ *     summary: Get all job offers with optional filtering
+ *     tags: [JobOffer]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: title
+ *         schema:
+ *           type: string
+ *         description: Filter by job offer title
+ *       - in: query
+ *         name: location
+ *         schema:
+ *           type: string
+ *         description: Filter by job offer location
+ *       - in: query
+ *         name: salaryRange
+ *         schema:
+ *           type: string
+ *         description: Filter by job offer salary range
+ *       - in: query
+ *         name: company
+ *         schema:
+ *           type: string
+ *         description: Filter by company name
+ *       - in: query
+ *         name: experience
+ *         schema:
+ *           type: string
+ *         description: Filter by experience
+ *     responses:
+ *       200:
+ *         description: A list of job offers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/JobOffer'
+ *       400:
+ *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+jobOfferRouter.get('/', async (req, res) => {
+  try {
+    const filters = req.query;
+    console.log(filters)
+    if(Object.keys(filters).length === 0){
+      res.status(405).json({error:"A search parameter must exist while browsing Job Offers"});
+    }
+    const jobOffers = await getAllJobOffers(filters);
+    res.json(jobOffers);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
 jobOfferRouter.use(authenticateToken);
-
-
 
 /**
  * @swagger
@@ -18,7 +82,7 @@ jobOfferRouter.use(authenticateToken);
 
 /**
  * @swagger
- * /joboffers:
+ * /joboffers/newJobOffer:
  *   post:
  *     summary: Create a new job offer
  *     tags: [JobOffer]
@@ -43,6 +107,9 @@ jobOfferRouter.use(authenticateToken);
  *               salary:
  *                 type: number
  *                 description: Job salary
+ *               expId:
+ *                 type: number
+ *                 description: Index Based Job Experience Id ["< 1 year", "1-2 years", "3-4 years", "5+ years"]
  *     responses:
  *       200:
  *         description: Job offer successfully created
@@ -65,15 +132,16 @@ jobOfferRouter.use(authenticateToken);
  */
 
 
-jobOfferRouter.post('/', async (req, res) => {
-  try {
+jobOfferRouter.post('/newJobOffer', async (req, res) => {
+  try { 
     if (!req.user || req.user.role !== "RECRUITER") {
       return res.status(403).json({ error: 'Unauthorized access' });
     }
-    const recruiterId = req.user.id;
+    const recruiterId = parseInt(req.user.userId);
     const newJobOffer = await createJobOffer(recruiterId, req.body);
     res.json(newJobOffer);
   } catch (error) {
+    
     res.status(400).json({ error: error.message });
   }
 });
@@ -237,39 +305,6 @@ jobOfferRouter.delete('/:id', async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /joboffers:
- *   get:
- *     summary: Get all job offers
- *     tags: [JobOffer]
- *     security:
- *       - cookieAuth: []
- *     responses:
- *       200:
- *         description: Successful response
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/JobOffer'
- *       400:
- *         description: Invalid request
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
-jobOfferRouter.get('/', async (req, res) => {
-  try {
-   
-    const recruiterId = req.user.id;
-    const jobOffers = await getAllJobOffers(recruiterId);
-    res.json(jobOffers);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
+
 
 export default jobOfferRouter;

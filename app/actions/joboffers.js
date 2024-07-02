@@ -2,24 +2,31 @@
 
 import { PrismaClient } from '@prisma/client';
 import logActivity from '../../utils/logsActivites.js';
+import { expArray } from '../../utils/expArr.js';
 
 const prisma = new PrismaClient();
 
-export async function createJobOffer(recruiterId, jobOfferData) {
-  const recruiter = await prisma.recruiter.findUnique({ where: { id: recruiterId } });
+export async function createJobOffer(userId, jobOfferData) {
+  const recruiter = await prisma.recruiter.findUnique({ where: { userId } });
 
-  if (recruiter?.role !== 'main') {
+  if (recruiter?.role.toLocaleLowerCase() !== 'main') {
     throw new Error('Only main recruiters can create job offers.');
   }
+
+  const {expId} = jobOfferData
+
+  const exp = expArray[expId]
+  delete jobOfferData.expId 
 
   const newJobOffer = await prisma.jobOffer.create({
     data: {
       ...jobOfferData,
+      experience:exp,
       companyId: recruiter.companyId,
     },
   });
   
-  await logActivity(recruiterId, 'JOB_OFFER_CREATED', `Job offer created: ${newJobOffer.title}`);
+  await logActivity(userId, 'JOB_OFFER_CREATED', `Job offer created: ${newJobOffer.title}`);
   return newJobOffer;
 }
 
@@ -115,10 +122,13 @@ export async function deleteJobOffer(jobOfferId, recruiterId) {
   return deletedJobOffer;
 }
 
-export async function getAllJobOffers(companyId) {
+export async function getAllJobOffers( params) {
+  const {title, location, company} = params;
   const jobOffers = await prisma.jobOffer.findMany({
     where: {
-      companyId
+      companyId: company ? parseInt(company) : undefined,
+      title,
+      location
     },
   });
   

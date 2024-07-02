@@ -1,9 +1,11 @@
+//@ts-check
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // Create a new application
-export async function createApplication(applicationData) {
+export async function createApplication(applicationData, recruitId) {
   const jobOffer = await prisma.jobOffer.findUnique({
     where: { id: applicationData.jobOfferId },
   });
@@ -14,8 +16,7 @@ export async function createApplication(applicationData) {
 
   const newApplication = await prisma.application.create({
     data: {
-      jobName: jobOffer.title,
-      recruitId: applicationData.recruitId,
+      recruitId,
       jobOfferId: applicationData.jobOfferId,
       status: 'pending',
     },
@@ -34,16 +35,23 @@ export async function getAllApplications() {
 export async function getApplicationsByRecruit(recruitId) {
   const applications = await prisma.application.findMany({
     where: { recruitId },
+    include:{
+      jobOffer:{include:{company:true}}
+    }
   });
   return applications;
 }
 
 // Get all applications for a specific job offer
-export async function getApplicationsByJobOffer(jobOfferId) {
+export async function getApplicationsByJobOffer(jobOfferId, companyId) {
   const applications = await prisma.application.findMany({
-    where: { jobOfferId },
+    where: { jobOfferId},
+    include:{jobOffer:true}
   });
-  return applications;
+
+  const validApplications = applications.filter((i)=> i.jobOffer?.companyId === companyId )
+
+  return validApplications
 }
 
 // Get an application by ID

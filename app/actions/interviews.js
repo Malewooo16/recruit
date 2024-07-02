@@ -1,13 +1,32 @@
-
+//@ts-check
 import { PrismaClient } from '@prisma/client';
+import { chars, randStingGen } from '../../test.js';
 
 const prisma = new PrismaClient();
 
 // Create a new interview
-export async function createInterview(interviewData) {
+export async function createInterview(interviewData, applicationId) {
+
+  let joinMeetingUrl, startMeetingUrl;
+  //Zoom client Mockup
+  if(interviewData.online){
+    joinMeetingUrl = `zoom-client.com/meeting?join=${randStingGen(chars)}`;
+    startMeetingUrl = `zoom-client.com/meeting?start=${randStingGen(chars)}`;
+  }
+  
   const newInterview = await prisma.interview.create({
-    data: interviewData,
+    data: {...interviewData, joinMeetingUrl, startMeetingUrl},
   });
+  
+  await prisma.application.update({
+    where:{
+      id: applicationId
+    },
+    data:{
+      status:"interview"
+    }
+  })
+
   return newInterview;
 }
 
@@ -21,8 +40,9 @@ export async function getAllInterviews() {
 export async function getInterviewsByRecruit(recruitId) {
   const interviews = await prisma.interview.findMany({
     where: { recruitId },
+   
   });
-  return interviews;
+  return interviews.map((i)=>({...i, startMeetingUrl:undefined}));
 }
 
 // Get interviews for a specific job offer

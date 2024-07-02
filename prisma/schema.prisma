@@ -8,13 +8,13 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  password String
-  role     String
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  password    String
+  role        String
+  ActivityLog ActivityLog[]
   recruit     Recruit?
   recruiter   Recruiter?
-  ActivityLog ActivityLog[]
 }
 
 model ActivityLog {
@@ -27,81 +27,77 @@ model ActivityLog {
 }
 
 model Company {
-  id         Int          @id @default(autoincrement())
-  name       String
-  industry   String
-  departments String?
-  website     String
-  logo        String?
-  emailAddress String
-  phoneNumber  String
+  id              Int         @id @default(autoincrement())
+  name            String
+  industry        String
+  departments     String?
+  website         String
+  logo            String?
+  emailAddress    String
+  phoneNumber     String
   physicalAddress String
-  recruiters Recruiter[]
-  jobOffers  JobOffer[]
+  jobOffers       JobOffer[]
+  recruiters      Recruiter[]
 }
 
 model Recruit {
-  id        Int    @id @default(autoincrement())
-  firstName String
-  lastName  String
-  email     String @unique
-  userId    Int  @unique
-  user      User @relation(fields: [userId], references: [id])
+  id           Int           @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  email        String        @unique
+  userId       Int           @unique
   applications Application[]
   interviews   Interview[]
+  user         User          @relation(fields: [userId], references: [id])
 }
 
 model Recruiter {
-  id         Int      @id @default(autoincrement())
-  firstName  String
-  lastName   String
-  email      String @unique
-  role       String
-  userId     Int      @unique
-  user       User     @relation(fields: [userId], references: [id])
-  companyId  Int?
-  company    Company?  @relation(fields: [companyId], references: [id])
-  interviews Interview[]
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  email     String   @unique
+  role      String
+  userId    Int      @unique
+  companyId Int?
+  company   Company? @relation(fields: [companyId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model JobOffer {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String
-  location    String
-  salary      Float
-  companyId   Int
-  company     Company       @relation(fields: [companyId], references: [id])
+  id           Int           @id @default(autoincrement())
+  title        String
+  description  String
+  location     String
+  salary       Float
+  companyId    Int
+  experience   String?
   applications Application[]
   interviews   Interview[]
+  company      Company       @relation(fields: [companyId], references: [id])
 }
 
 model Application {
   id         Int       @id @default(autoincrement())
-  jobName    String
-  recruit    Recruit   @relation(fields: [recruitId], references: [id])
   recruitId  Int
-  jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
   jobOfferId Int?
   status     String
-  createdAt  DateTime @default(now())
+  createdAt  DateTime  @default(now())
+  jobOffer   JobOffer? @relation(fields: [jobOfferId], references: [id], onDelete: Cascade)
+  recruit    Recruit   @relation(fields: [recruitId], references: [id])
 }
 
 model Interview {
-  id          Int       @id @default(autoincrement())
-  date        DateTime
-  location    String?
-  email       String
-  phone       String
-  online      Boolean
-  startTime   DateTime?
-  joinMeetingUrl   String?
-  startMeetingUrl   String?
-  recruit     Recruit   @relation(fields: [recruitId], references: [id])
-  recruitId   Int
-  recruiter   Recruiter @relation(fields: [recruiterId], references: [id])
-  recruiterId Int
-  jobOffer    JobOffer? @relation(fields: [jobOfferId], references: [id])
-  jobOfferId  Int?
+  id              Int       @id @default(autoincrement())
+  date            DateTime
+  location        String?
+  email           String
+  phone           String
+  online          Boolean
+  startTime       DateTime?
+  joinMeetingUrl  String?
+  startMeetingUrl String?
+  recruitId       Int
+  jobOfferId      Int?
+  jobOffer        JobOffer? @relation(fields: [jobOfferId], references: [id])
+  recruit         Recruit   @relation(fields: [recruitId], references: [id])
 }
-

@@ -9,9 +9,10 @@ import swaggerJSDoc from "swagger-jsdoc"
 import { options } from "./app/swagger.js"
 import swaggerUi from 'swagger-ui-express'
 import companyRouter from "./app/routes/company.js"
-import jobOfferRouter from "./app/routes/company.js"
+
 import applicationRouter from "./app/routes/applications.js"
 import interviewRouter from "./app/routes/interviews.js"
+import jobOfferRouter from "./app/routes/joboffers.js"
 
 
 

@@ -90,6 +90,17 @@ export async function getRecruiterInfo(userId){
   return recruiter.recruiter
 }
 
+export async function getRecruitInfo(userId){
+  const recruit = await prisma.user.findUnique({
+    where:{id:userId},
+
+    select:{
+      recruit:true
+    }
+  })
+  return recruit.recruit
+}
+
 export async function resetPassword(email, newPassword) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {

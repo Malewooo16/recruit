@@ -44,7 +44,7 @@ companyRouter.use(authenticateToken);
  *               emailAddress:
  *                 type: string
  *                 description: Company Email Address
- *               address:
+ *               physicalAddress:
  *                 type: string
  *                 description: Company Physical Address
  *               website:

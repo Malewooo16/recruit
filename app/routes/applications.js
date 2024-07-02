@@ -1,7 +1,8 @@
-// @ts-check
+
 import express from 'express';
 import { authenticateToken } from '../actions/auth.js';
 import { createApplication, getAllApplications, getApplicationsByRecruit, getApplicationsByJobOffer, getApplicationById, updateApplicationStatus, deleteApplication } from '../actions/applications.js';
+import { getRecruitInfo, getRecruiterInfo } from '../actions/users.js';
 
 
 
@@ -22,8 +23,6 @@ applicationRouter.use(authenticateToken);
  *   post:
  *     summary: Create a new application
  *     tags: [Application]
- *     security:
- *       - cookieAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -31,15 +30,9 @@ applicationRouter.use(authenticateToken);
  *           schema:
  *             type: object
  *             properties:
- *               recruitId:
- *                 type: integer
- *                 description: ID of the recruit
  *               jobOfferId:
  *                 type: integer
  *                 description: ID of the job offer
- *               status:
- *                 type: string
- *                 description: Status of the application
  *     responses:
  *       200:
  *         description: Application successfully created
@@ -56,8 +49,12 @@ applicationRouter.use(authenticateToken);
  */
 applicationRouter.post('/', async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "RECRUIT") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
     const applicationData = req.body;
-    const newApplication = await createApplication(applicationData);
+    const recruit = await getRecruitInfo(req.user.userId)
+    const newApplication = await createApplication(applicationData, recruit?.id);
     res.json(newApplication);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -128,10 +125,15 @@ applicationRouter.get('/', async (req, res) => {
  *             schema:
  *               $ref: '#/components/schemas/ErrorResponse'
  */
-applicationRouter.get('/recruit/:recruitId', async (req, res) => {
+applicationRouter.get('/recruit/:userId', async (req, res) => {
   try {
-    const recruitId = parseInt(req.params.recruitId, 10);
-    const applications = await getApplicationsByRecruit(recruitId);
+    if (req.user.userId != req.params.userId) {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
+    
+    const recruit = await getRecruitInfo(parseInt(req.params.userId))
+    
+    const applications = await getApplicationsByRecruit(recruit?.id);
     res.json(applications);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -171,8 +173,12 @@ applicationRouter.get('/recruit/:recruitId', async (req, res) => {
  */
 applicationRouter.get('/jobOffer/:jobOfferId', async (req, res) => {
   try {
+    if (!req.user || req.user.role !== "RECRUITER") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
+    const recruiter = await getRecruiterInfo(req.user.userId)
     const jobOfferId = parseInt(req.params.jobOfferId, 10);
-    const applications = await getApplicationsByJobOffer(jobOfferId);
+    const applications = await getApplicationsByJobOffer(jobOfferId, recruiter.companyId);
     res.json(applications);
   } catch (error) {
     res.status(400).json({ error: error.message });

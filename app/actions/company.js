@@ -15,6 +15,7 @@ export async function createCompany(companyData, userId) {
  
  catch(e){
   console.log(e)
+  return {error:"something"}
  }
  
 }

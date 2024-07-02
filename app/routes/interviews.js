@@ -1,4 +1,4 @@
-// @ts-check
+
 import express from 'express';
 import { authenticateToken } from '../actions/auth.js';
 import { createInterview, getAllInterviews, getInterviewsByRecruit, getInterviewsByJobOffer, getInterviewById, updateInterview, deleteInterview } from '../actions/interviews.js';
@@ -32,16 +32,31 @@ interviewRouter.use(authenticateToken);
  *               recruitId:
  *                 type: integer
  *                 description: ID of the recruit
+ *               applicationId:
+ *                 type: integer
+ *                 description: ID of the job offer
  *               jobOfferId:
  *                 type: integer
  *                 description: ID of the job offer
+ *               location:
+ *                 type: string
+ *                 description: Location of the interview
  *               date:
  *                 type: string
  *                 format: date-time
  *                 description: Date and time of the interview
- *               status:
+ *               phone:
  *                 type: string
- *                 description: Status of the interview
+ *                 description: Contacts for the interview
+ *               email:
+ *                 type: string
+ *                 description: Email for the interview
+ *               online:
+ *                 type: boolean
+ *                 description: Status if the is remote or in-person
+ *               startTime:
+ *                 type: string
+ *                 description: Starting time interview
  *     responses:
  *       200:
  *         description: Interview successfully created
@@ -58,8 +73,12 @@ interviewRouter.use(authenticateToken);
  */
 interviewRouter.post('/', async (req, res) => { 
   try {
+    if (!req.user || req.user.role !== "RECRUITER") {
+      return res.status(403).json({ error: 'Unauthorized access' });
+    }
     const interviewData = req.body;
-    const newInterview = await createInterview(interviewData);
+    const {applicationId, ...rest} = interviewData
+    const newInterview = await createInterview(rest, applicationId);
     res.json(newInterview);
   } catch (error) {
     res.status(400).json({ error: error.message });

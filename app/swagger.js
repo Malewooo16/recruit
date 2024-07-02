@@ -55,34 +55,62 @@ export const options = {
                         }
                     }
                 },
-                Application: {
+                JobOffer: {
                     type: 'object',
                     properties: {
                       id: {
                         type: 'integer',
-                        description: 'Application ID'
+                        description: 'Job Offer ID'
                       },
-                      jobName: {
+                      title: {
                         type: 'string',
-                        description: 'Application Job Name'
+                        description: 'Job Offer Title'
                       },
-                      recruitId: {
+                      description: {
+                        type: 'string',
+                        description: 'Job Offer Description'
+                      },
+                      location: {
+                        type: 'string',
+                        description: 'Location of the Offered Job'
+                      },
+                      salary: {
                         type: 'integer',
-                        description: 'Recruit ID'
+                        description: 'Job offer Salary'
                       },
-                      jobOfferId: {
+                      companyId: {
                         type: 'integer',
-                        description: 'Job offer ID'
+                        description: 'Job Offer Comapny Id'
                       },
-                      status: {
-                        type: 'string',
-                        description: 'Application status'
-                      },
-                      createdAt: {
-                        type: 'string',
-                        format: 'date-time',
-                        description: 'Creation timestamp'
-                      },}},
+                      }},
+                Application: {
+                        type: 'object',
+                        properties: {
+                          id: {
+                            type: 'integer',
+                            description: 'Application ID'
+                          },
+                          jobName: {
+                            type: 'string',
+                            description: 'Application Job Name'
+                          },
+                          recruitId: {
+                            type: 'integer',
+                            description: 'Recruit ID'
+                          },
+                          jobOfferId: {
+                            type: 'integer',
+                            description: 'Job offer ID'
+                          },
+                          status: {
+                            type: 'string',
+                            description: 'Application status'
+                          },
+                          createdAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Creation timestamp'
+                          },}},
                 Company: {
                     type: 'object',
                     required:['name', 'phoneNumber', 'emailAddress', 'address', 'website'],
