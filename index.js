@@ -1,45 +1,28 @@
 //@ts-check
-import express from "express"
-import usersRoutes from "./app/routes/users.js"
-import recruitRouter from "./app/routes/recruit.js"
-import recruiterRouter from "./app/routes/recruiter.js"
-import cookieParser from "cookie-parser"
-import cors from "cors"
-import swaggerJSDoc from "swagger-jsdoc"
-import { options } from "./app/swagger.js"
-import swaggerUi from 'swagger-ui-express'
-import companyRouter from "./app/routes/company.js"
 
-import applicationRouter from "./app/routes/applications.js"
-import interviewRouter from "./app/routes/interviews.js"
-import jobOfferRouter from "./app/routes/joboffers.js"
+import express from 'express';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
 
 
+import './app/actions/passport.js'; // Ensure this is imported to configure Passport
+import authRouter from './app/routes/auth.js';
 
-const app = express()
-app.use(express.json())
-app.use(cookieParser())
+const app = express();
 
-app.use(cors({
-  origin:"http://127.0.0.1:5500",
-  credentials:true,
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allow specific headers
-}))
+app.use(express.static('./clientTest'));
 
-app.use(`/api/users`, usersRoutes );
-app.use(`/api/recruits`, recruitRouter);
-app.use(`/api/recruiters`, recruiterRouter);
-app.use('/api/companies', companyRouter);
-app.use('/api/joboffers', jobOfferRouter);
-app.use(`/api/applications`, applicationRouter);
-app.use(`/api/interviews`, interviewRouter);
+app.use(express.json());
+app.use(cookieParser());
+app.use(session({ secret: "mosterkityyKeyboard?", resave: false, saveUninitialized: false }));
 
+app.use(passport.initialize());
+app.use(passport.session());
 
-//TODO include additional checks for fetching datat to ensure the integrity of the user view levels
+app.use('/auth', authRouter);
 
-const specs = swaggerJSDoc(options)
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
-app.listen(3000, ()=>{
-    console.log("App running on port 3000")
-})
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
